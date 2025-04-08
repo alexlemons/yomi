@@ -1,3 +1,6 @@
+raw_data/dict
+raw_data/output
+
 # Logs
 logs
 *.log

@@ -1,73 +1,94 @@
-import { useEffect, useRef, useState } from "react";
-import { useLocalStorage } from "usehooks-ts";
-import { Background } from "./components/background";
-import { CharacterContainer } from "./components/character-container";
-import { useWindowSize } from "./hooks/use-window-size";
-import { getAllKanji, LanguageLevel } from "./characters";
+import {
+  useEffect,
+  useState,
+} from "react";
+import {
+  CharacterContainer,
+  InfoContainer,
+  SelectedContainer,
+  ScrollState,
+} from './components';
+import {
+  Characters,
+  CharacterProperties,
+} from "./characters";
+import { RootFontSizeProvider } from "./context";
+import { shuffleArray } from "./utils/array";
 
-const ALL_KANJI = getAllKanji();
+import { kanji1 } from './characters/kanji/kanji-1'
+import { kanji2 } from './characters/kanji/kanji-2'
+import { kanji3 } from './characters/kanji/kanji-3'
 
-// const x = Object.entries(ALL_KANJI)
-//   .filter(([_k, v]) => v.level === 2)
-//   .filter(([_k, v]) => v.meaning.split(', ').length > 2)
-//   .reduce<Record<string, string>>((acc, [k, v]) => {
-//     acc[k] = v.meaning;
-//     return acc;
-//   }, {});
+function formatCharacters(
+  characters: CharacterProperties[],
+): Characters {
+  return shuffleArray(characters)
+    .reduce<Characters>((acc, c) => {
+      acc[c.literal] = c;
+      return acc;
+    }, {});
+}
 
-// console.log(x)
+const INITIAL_CHARACTERS = {
+  ...formatCharacters(kanji1),
+  ...formatCharacters(kanji2),
+  ...formatCharacters(kanji3),
+}
+
+const CHARACTERS_TO_LOAD = [
+  '/kanji-4.json',
+  '/kanji-5.json',
+  '/kanji-6.json',
+  '/kanji-8.json',
+  '/kanji-9.json',
+  '/kanji-10.json',
+  '/kanji-no-grade.json',
+  // '/kanji-ghost.json',
+];
 
 export const App = () => {
-  const stateId = useRef(0);
-
-  // The target character that the user is trying to guess from the meaning.
-  const [target, setTarget] = useState<string | null>(null);
-  const [score, setScore] = useState(0);
-  const [levelIndex, setLevelIndex] = useLocalStorage('level', 0);
-  const [highScore, setHighScore] = useLocalStorage('high-score', 0);
-  const { windowSize, resizeInProgress } = useWindowSize();
+  const [allCharacters, setAllCharacters] = useState<Characters>(INITIAL_CHARACTERS);
+  const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
+  const [scrollState, setScrollState] = useState<ScrollState>([0, 0, 0, null]);
 
   useEffect(() => {
-    if (score > highScore) {
-      setHighScore(score);
-    }  
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [score])
+    async function sequentiallyLoadCharacters() {
+      for (const path of CHARACTERS_TO_LOAD) {
+        try {
+          const response = await fetch(path);
+          if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+          }
+      
+          const json = await response.json();
+          setAllCharacters(prev => ({
+            ...prev,
+            ...formatCharacters(json),
+          }));
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    }
 
-  const handleLevelClick = () => {
-    setLevelIndex((levelIndex + 1) % LanguageLevel.length);
-  }
-
-  const meaning = target && ALL_KANJI[target].meaning;
-  const level = LanguageLevel[levelIndex];
-
-  //// shuffle characters in sentence
-  //// button to rearrange on left
-  /// button to select on right
-
+    sequentiallyLoadCharacters();
+  }, []);
 
   return (
-    <>
-      {resizeInProgress ? null : <Background />}
-      {meaning ? <div className="meaning">{target}</div> : null}
-      <CharacterContainer
-        allCharacters={ALL_KANJI}
-        level={level}
-        setScore={setScore}
-        setTarget={setTarget}
-        target={target}
-        windowSize={windowSize}
+    <RootFontSizeProvider>
+      <SelectedContainer 
+        allCharacters={allCharacters}
+        selectedCharacter={selectedCharacter}
       />
-      {/* <div>未だ解決していない殺人事件がある</div> */}
-      <div className="controls">
-        <div
-          className="level"
-          onClick={handleLevelClick}
-        >{`N${level}`}</div>
-
-        <div>I</div>
-        {/* <div>{score} ★ {highScore}</div> */}
-      </div>
-    </>
+      <InfoContainer 
+        scrollState={scrollState}
+      />
+      <CharacterContainer
+        allCharacters={allCharacters}
+        setScrollState={setScrollState}
+        selectedCharacter={selectedCharacter}
+        setSelectedCharacter={setSelectedCharacter}
+      />
+    </RootFontSizeProvider>
   );
 }

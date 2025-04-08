@@ -1,0 +1,35 @@
+/* Full screen container for react-window */
+.root {
+  height: 100vh;
+  position: relative;
+  width: 100%;
+}
+
+.block {
+  display: flex;
+  justify-content: center;
+}
+
+.blockInner {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: auto;
+  max-width: 51rem;
+}
+
+.character {
+  align-items: center;
+  border: 0.5px solid var(--border);
+  color: var(--faded);
+  cursor: pointer;
+  display: flex;
+  height: 3.4rem;
+  justify-content: center;
+  position: relative;
+  transition: color 0.2s ease-in;
+  width: 3.4rem;
+}
+
+.characterSelected {
+  color: var(--dark);
+}

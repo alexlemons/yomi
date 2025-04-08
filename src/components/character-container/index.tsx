@@ -1,144 +1,165 @@
 import {
+  forwardRef,
+  useContext,
   useEffect,
   useMemo,
-  useRef,
-  useState,
+  CSSProperties,
   Dispatch,
   SetStateAction,
 } from "react";
-import {
-  getRandomItemFromStringArray,
-  shuffleArray,
-} from "../../utils/array";
-import { Characters, LanguageLevel } from "../../characters";
-import { WindowSize } from "../../hooks/use-window-size";
-import { Perlin } from "../../utils/perlin";
-import './index.css';
+import AutoSizer from "react-virtualized-auto-sizer";
+import { FixedSizeList as List } from 'react-window';
+import { RootFontSizeContext } from "../../context";
+import { Characters } from "../../characters";
+import classes from './index.module.css';
 
+const ROW_LENGTH = 15;
+const ROWS_PER_BLOCK = 12;
+const BLOCK_LENGTH = ROW_LENGTH * ROWS_PER_BLOCK;
+const ROW_HEIGHT_REM = 3.4;
+
+// [firstBlockIndex, lastBlockIndex, totalBlocks, firstBlockGrade]
+export type ScrollState = [number, number, number, number | null];
+
+type BlockProps = {
+  data: {
+    blocks: string[][];
+    selectedCharacter: string | null;
+    setSelectedCharacter: Dispatch<SetStateAction<string | null>>;
+  };
+  index: number;
+  style: CSSProperties;
+};
+
+const Block = ({ data, index, style }: BlockProps) => {
+  const {
+    blocks,
+    selectedCharacter,
+    setSelectedCharacter,
+  } = data;
+
+  const characters = blocks[index];
+  const rootFontSize = useContext(RootFontSizeContext);
+
+  return (
+    <div
+      className={classes.block}
+      style={{
+        ...style,
+        top: `${Number(style.top) + (rootFontSize * ROW_HEIGHT_REM)}px`,
+      }}
+    >
+      <div className={classes.blockInner}>
+        {characters.map(character => {
+          return (
+            <div
+              className={[
+                classes.character,
+                character === selectedCharacter 
+                  ? classes.characterSelected 
+                  : '',
+              ].join(' ')}
+              key={character}
+              onClick={() => setSelectedCharacter(character)}
+            >
+              {character}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 type CharacterContainerProps = {
   allCharacters: Characters;
-  level: LanguageLevel;
-  setScore: Dispatch<SetStateAction<number>>;
-  target: string | null;
-  setTarget: Dispatch<SetStateAction<string | null>>;
-  windowSize: WindowSize;
+  setScrollState: Dispatch<SetStateAction<ScrollState>>;
+  selectedCharacter: string | null;
+  setSelectedCharacter: Dispatch<SetStateAction<string | null>>;
 }
 
-function getContainerLengthByScreenWidth(screenWidth: number) {
-  if (screenWidth < 500) {
-    return 40;
-  }
-  return 69;
-}
+const innerElementType = forwardRef<
+  HTMLDivElement,
+  { style: CSSProperties }
+>(({ style, ...rest }, ref) => {
+  const rootFontSize = useContext(RootFontSizeContext);
+  return (
+    <div
+      ref={ref}
+      style={{
+        ...style,
+        height: `${Number(style.height) + (rootFontSize * ROW_HEIGHT_REM)}px`
+      }}
+      {...rest}
+    />
+  );
+})
 
 export const CharacterContainer = ({
   allCharacters,
-  level,
-  setScore,
-  target,
-  setTarget,
-  windowSize
+  setScrollState,
+  selectedCharacter,
+  setSelectedCharacter,
 }: CharacterContainerProps) => {
-  const [disabled, setDisabled] = useState(false);
+  const rootFontSize = useContext(RootFontSizeContext);
 
-  const reset = () => {
-    setTarget(getRandomItemFromStringArray(characters));
-    setDisabled(false);
-  }
+  // Characters split into subset blocks.
+  // Blocks rendered by react-window.
+  const blocks = useMemo(() => {    
+    return Object.keys(allCharacters)
+      .reduce<string[][]>((acc, character, idx) => {
+        const blockIndex = Math.floor(idx/BLOCK_LENGTH);
 
-  // Save timeout callback so reference to it and it's scope
-  // is not lost between renders.
-  const savedResetCallback = useRef(reset);
-  
-  // Character number reduced to fit screen width.
-  // Filtered by LanguageLevel
-  // Randomly shuffled.
-  const characters = useMemo(() => {    
-    return shuffleArray(
-      Object.entries(allCharacters).filter(([_k, v]) => v.level === level)
-    )
-      .slice(0, getContainerLengthByScreenWidth(windowSize.x))
-      .map(([k, _v]) => k);
-  }, [allCharacters, level, windowSize.x]);
-  
-  // Set the initial target
+        if(!acc[blockIndex]) {
+          acc[blockIndex] = [];
+        }
+      
+        acc[blockIndex].push(character);
+
+        return acc;
+      }, []);
+  }, [allCharacters]);
+
+  // Select first character on mount.
   useEffect(() => {
-    setTarget(null);
-    setDisplayedCharacters([]);
-    
-    setTimeout(() => {
-      setTarget(
-        getRandomItemFromStringArray(characters)
-      );
-    }, 750);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [characters])
-  
-  // From characters, only a random subset are displayed to user to guess from.
-  const [displayedCharacters, setDisplayedCharacters] = useState<string[]>([]);
+    setSelectedCharacter(blocks[0][0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  useEffect(() => {
-    if (!target) return;
-
-    const noise = new Perlin(Math.random());
-    const LINE_LENGTH = 23;
-
-    // Simplex noise calculated using character x/y position in container.
-    // If noise value above threshold it is displayed.
-    setDisplayedCharacters([
-      ...characters.filter(
-        (_, idx) => Math.abs(noise.simplex2((idx + 1) % LINE_LENGTH, Math.floor((idx + 1) / LINE_LENGTH))) > 0.75
-      ),
-      target,
-    ]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [target]);
-
-  const handleGuess = (character: string) => {
-    if (!target) return;
-    
-    // Disable interactions.
-    // Fade all characters out except target.
-    // Update score
-    // Reset target after timeout.
-    setDisabled(true);
-    setDisplayedCharacters([target]);
-    setScore(prev => character === target
-      ? prev + (LanguageLevel.length - allCharacters[target].level + 1) 
-      : 0
-    );
-    
-    savedResetCallback.current = reset;
-    
-    // setTimeout(() => {
-    //   savedResetCallback.current();
-    // }, 1500);
-  }
-
-  // Show result after guess: incorrect guess and/or target
-  const isResult = displayedCharacters.length === 1 || displayedCharacters.length === 2;
+  const itemData = {
+    blocks,
+    selectedCharacter,
+    setSelectedCharacter,
+  };
 
   return (
-    <div className="character-container">
-      {characters.map(c => {
-        const displayed = displayedCharacters.includes(c);
-
-        return (
-          <div 
-            className={[
-              'character',
-              displayed ? 'character-displayed' : '',
-              isResult &&  c === target ? 'character-correct' : '',
-              displayedCharacters.length === 0 ? 'no-transition' : '',
-            ].join(' ')}
-            key={c}
-            onClick={() => displayed && !disabled && handleGuess(c)}
+    <div className={classes.root}>
+      <AutoSizer>
+        {({ height, width }) => (
+          <List
+            height={height}
+            innerElementType={innerElementType}
+            itemCount={blocks.length}
+            itemData={itemData}
+            itemSize={rootFontSize * ROW_HEIGHT_REM * ROWS_PER_BLOCK}
+            overscanCount={2}
+            onItemsRendered={({
+              visibleStartIndex,
+              visibleStopIndex
+            }) => {
+              setScrollState([
+                visibleStartIndex,
+                visibleStopIndex,
+                blocks.length,
+                  allCharacters[blocks[visibleStartIndex][0]].misc.grade,
+              ]);
+            }}
+            width={width}
           >
-            {c}
-          </div>
-        );
-      })}
+            {Block}
+          </List>
+        )}
+      </AutoSizer>
     </div>
   );
 }
