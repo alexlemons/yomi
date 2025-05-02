@@ -1,4 +1,4 @@
-# kanji-gen
+# kanjigen
 
 漢字源
 
