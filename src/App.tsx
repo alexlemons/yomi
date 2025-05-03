@@ -15,9 +15,9 @@ import {
 import { RootFontSizeProvider } from "./context";
 import { shuffleArray } from "./utils/array";
 
-import { kanji1 } from './characters/kanji/kanji-1'
-import { kanji2 } from './characters/kanji/kanji-2'
-import { kanji3 } from './characters/kanji/kanji-3'
+import { kanji1 } from './characters/kanji/kanji-1';
+import { kanji2 } from './characters/kanji/kanji-2';
+import { kanji3 } from './characters/kanji/kanji-3';
 
 function formatCharacters(
   characters: CharacterProperties[],
@@ -36,14 +36,13 @@ const INITIAL_CHARACTERS = {
 }
 
 const CHARACTERS_TO_LOAD = [
-  '/kanji-4.json',
-  '/kanji-5.json',
-  '/kanji-6.json',
-  '/kanji-8.json',
-  '/kanji-9.json',
-  '/kanji-10.json',
-  '/kanji-no-grade.json',
-  // '/kanji-ghost.json',
+  '/kanjigen/kanji-4.json',
+  '/kanjigen/kanji-5.json',
+  '/kanjigen/kanji-6.json',
+  '/kanjigen/kanji-8.json',
+  '/kanjigen/kanji-9.json',
+  '/kanjigen/kanji-10.json',
+  '/kanjigen/kanji-no-grade.json',
 ];
 
 export const App = () => {
