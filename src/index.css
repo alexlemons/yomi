@@ -1,6 +1,6 @@
 @font-face {
   font-family: Plex;
-  src: url(IBMPlexSans-Light.woff2);
+  src: url('/kanjigen/IBMPlexSans-Light.woff2');
 }
 
 * {
