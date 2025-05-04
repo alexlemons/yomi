@@ -21,11 +21,11 @@ export const SelectedContainer = ({
   useEffect(() => {
     if (!selectedCharacter) return;
 
-    // Transition previous character out then set
+    // Transition character in/out
     setTimeout(() => {
       setCharacter(allCharacters[selectedCharacter]);
     }, 400);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCharacter, setCharacter]);
 
   if (!character) return null;

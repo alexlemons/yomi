@@ -16,6 +16,9 @@
   --faded: hsla(200, 75%, 15%, 0.45);
   --border: hsl(0, 0%, 80%);
 
+  --z1: 1000;
+  --z2: 2000;
+
   background: var(--light);
   color: var(--dark);
   font-family: Plex, sans-serif;

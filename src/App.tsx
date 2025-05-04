@@ -4,6 +4,8 @@ import {
 } from "react";
 import {
   CharacterContainer,
+  ErrorContainer,
+  ErrorMessage,
   InfoContainer,
   SelectedContainer,
   ScrollState,
@@ -46,9 +48,10 @@ const CHARACTERS_TO_LOAD = [
 ];
 
 export const App = () => {
+  const [error, setError] = useState<ErrorMessage | null>(null);
   const [allCharacters, setAllCharacters] = useState<Characters>(INITIAL_CHARACTERS);
   const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
-  const [scrollState, setScrollState] = useState<ScrollState>([0, 0, 0, null]);
+  const [scrollState, setScrollState] = useState<ScrollState>({ atBottom: false, grade: 1 });
 
   useEffect(() => {
     async function sequentiallyLoadCharacters() {
@@ -66,6 +69,7 @@ export const App = () => {
           }));
         } catch (error) {
           console.error(error);
+          setError(ErrorMessage.KANJI_FETCH_ERROR);
         }
       }
     }
@@ -88,6 +92,7 @@ export const App = () => {
         selectedCharacter={selectedCharacter}
         setSelectedCharacter={setSelectedCharacter}
       />
+      <ErrorContainer error={error} />
     </RootFontSizeProvider>
   );
 }

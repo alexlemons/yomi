@@ -18,8 +18,12 @@ const ROWS_PER_BLOCK = 12;
 const BLOCK_LENGTH = ROW_LENGTH * ROWS_PER_BLOCK;
 const ROW_HEIGHT_REM = 3.4;
 
-// [firstBlockIndex, lastBlockIndex, totalBlocks, firstBlockGrade]
-export type ScrollState = [number, number, number, number | null];
+export type ScrollState = {
+  atBottom: boolean;
+  grade: number | null;
+};
+
+
 
 type BlockProps = {
   data: {
@@ -147,12 +151,10 @@ export const CharacterContainer = ({
               visibleStartIndex,
               visibleStopIndex
             }) => {
-              setScrollState([
-                visibleStartIndex,
-                visibleStopIndex,
-                blocks.length,
-                  allCharacters[blocks[visibleStartIndex][0]].misc.grade,
-              ]);
+              setScrollState({
+                atBottom: (visibleStopIndex + 1) === blocks.length,
+                grade: allCharacters[blocks[visibleStartIndex][0]].misc.grade,
+              });
             }}
             width={width}
           >

@@ -8,27 +8,26 @@
   line-height: 1.8rem;
   max-width: 19.9rem;
   opacity: 0.05;
-  padding: 8.9rem 2.1rem 5.5rem;
+  padding: 8.9rem 2.1rem 3.4rem;
   position: absolute;
   top: 0;
   transition: opacity 0.4s ease-in;
-  z-index: 1000;
+  z-index: var(--z1);
 }
 
 .root h3 {
   font-size: 2.1rem;
   font-weight: 400;
   line-height: 2.1rem;
-  margin-bottom: 2.1rem;
+  margin-bottom: 1.8rem;
 }
 
 .meanings {
-  margin-bottom: 2.1rem;
+  margin-bottom: 1.8rem;
 }
 
 .readings {
   color: var(--faded);
-  margin-bottom: 1.1rem;
   position: relative
 }
 
