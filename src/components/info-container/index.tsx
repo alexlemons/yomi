@@ -43,9 +43,9 @@ export const InfoContainer = ({
           scrollState.atBottom ? classes.show : '',
         ].join(' ')}
       >
-        This site uses <a href="https://www.edrdg.org/wiki/index.php/KANJIDIC_Project" target="_blank">Kanjidic</a> as its source.
+        This site uses <a href="https://www.edrdg.org/wiki/index.php/KANJIDIC_Project" target="_blank">Kanjidic</a> as its data source.
         <br/>
-        For issues or suggestions please visit the <a href="https://github.com/alexlemons/kanjigen" target="_blank">GitHub</a>.
+        For any issues or suggestions please get in touch through <a href="https://github.com/alexlemons/kanjigen" target="_blank">GitHub</a>.
         <br/>
         For an extensive Japanese dictionary visit <a href="https://jisho.org" target="_blank">Jisho.org</a>.
       </p>
