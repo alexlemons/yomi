@@ -1,13 +1,12 @@
 .root {
-  background-color: var(--light);
+  background-color: white;
+  bottom: 0;
   color: red;
   font-size: 1.3rem;
-  left: 0;
   line-height: 3.4rem;
   padding: 0 2.1rem;
   position: absolute;
-  text-align: center;
-  top: 0;
-  width: 100%;
+  right: 0;
+  text-align: right;
   z-index: var(--z2);
 }

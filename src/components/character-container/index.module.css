@@ -1,9 +1,6 @@
 /* Full screen container for react-window */
 .root {
-  animation: fade-in 0.8s ease-in 0.6s;
-  animation-fill-mode: forwards;
   height: 100vh;
-  opacity: 0.01;
   position: relative;
   width: 100%;
 }
@@ -29,15 +26,21 @@
   height: 3.4rem;
   justify-content: center;
   position: relative;
-  transition: color 0.2s ease-in;
+  transition: background-color 0.2s ease-in;
   width: 3.4rem;
 }
 
 .characterSelected {
-  color: var(--dark);
+  background-color: white;
 }
 
-@keyframes fade-in {
-  0% { opacity: 0.01 }
-  100% { opacity: 1.0 }
+.characterSaved::after {
+  background-color: var(--faded);
+  content: '';
+  display: block;
+  width: 0.3rem;
+  height: 0.3rem;
+  position: absolute;
+  top: 0.0rem;
+  left: 0.0rem;
 }

@@ -39,6 +39,10 @@
   top: 0;
 }
 
+.readings:last-child {
+  margin-bottom: 1.8rem;
+}
+
 .show {
   opacity: 1.0;
 }

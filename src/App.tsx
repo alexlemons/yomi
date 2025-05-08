@@ -2,6 +2,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useLocalStorage } from 'usehooks-ts';
 import {
   CharacterContainer,
   ErrorContainer,
@@ -20,6 +21,8 @@ import { shuffleArray } from "./utils/array";
 import { kanji1 } from './characters/kanji/kanji-1';
 import { kanji2 } from './characters/kanji/kanji-2';
 import { kanji3 } from './characters/kanji/kanji-3';
+
+const LS_KEY_SAVED_CHARACTERS = 'saved-characters';
 
 function formatCharacters(
   characters: CharacterProperties[],
@@ -52,7 +55,8 @@ export const App = () => {
   const [allCharacters, setAllCharacters] = useState<Characters>(INITIAL_CHARACTERS);
   const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
   const [scrollState, setScrollState] = useState<ScrollState>({ atBottom: false, grade: 1 });
-
+  const [savedCharacters, setSavedCharacters] = useLocalStorage<string[]>(LS_KEY_SAVED_CHARACTERS, []);
+  
   useEffect(() => {
     async function sequentiallyLoadCharacters() {
       for (const path of CHARACTERS_TO_LOAD) {
@@ -81,6 +85,8 @@ export const App = () => {
     <RootFontSizeProvider>
       <SelectedContainer 
         allCharacters={allCharacters}
+        savedCharacters={savedCharacters}
+        setSavedCharacters={setSavedCharacters}
         selectedCharacter={selectedCharacter}
       />
       <InfoContainer 
@@ -88,6 +94,7 @@ export const App = () => {
       />
       <CharacterContainer
         allCharacters={allCharacters}
+        savedCharacters={savedCharacters}
         setScrollState={setScrollState}
         selectedCharacter={selectedCharacter}
         setSelectedCharacter={setSelectedCharacter}

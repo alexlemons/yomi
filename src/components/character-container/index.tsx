@@ -23,11 +23,10 @@ export type ScrollState = {
   grade: number | null;
 };
 
-
-
 type BlockProps = {
   data: {
     blocks: string[][];
+    savedCharacters: string[];
     selectedCharacter: string | null;
     setSelectedCharacter: Dispatch<SetStateAction<string | null>>;
   };
@@ -38,6 +37,7 @@ type BlockProps = {
 const Block = ({ data, index, style }: BlockProps) => {
   const {
     blocks,
+    savedCharacters,
     selectedCharacter,
     setSelectedCharacter,
   } = data;
@@ -62,6 +62,9 @@ const Block = ({ data, index, style }: BlockProps) => {
                 character === selectedCharacter 
                   ? classes.characterSelected 
                   : '',
+                savedCharacters.includes(character)
+                  ? classes.characterSaved 
+                  : '',
               ].join(' ')}
               key={character}
               onClick={() => setSelectedCharacter(character)}
@@ -77,6 +80,7 @@ const Block = ({ data, index, style }: BlockProps) => {
 
 type CharacterContainerProps = {
   allCharacters: Characters;
+  savedCharacters: string[];
   setScrollState: Dispatch<SetStateAction<ScrollState>>;
   selectedCharacter: string | null;
   setSelectedCharacter: Dispatch<SetStateAction<string | null>>;
@@ -101,6 +105,7 @@ const innerElementType = forwardRef<
 
 export const CharacterContainer = ({
   allCharacters,
+  savedCharacters,
   setScrollState,
   selectedCharacter,
   setSelectedCharacter,
@@ -132,6 +137,7 @@ export const CharacterContainer = ({
 
   const itemData = {
     blocks,
+    savedCharacters,
     selectedCharacter,
     setSelectedCharacter,
   };
