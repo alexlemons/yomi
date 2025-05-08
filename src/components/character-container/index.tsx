@@ -1,5 +1,6 @@
 import {
   forwardRef,
+  memo,
   useContext,
   useEffect,
   useMemo,
@@ -35,7 +36,7 @@ type BlockProps = {
   style: CSSProperties;
 };
 
-const Block = ({ data, index, style }: BlockProps) => {
+const Block = memo(({ data, index, style }: BlockProps) => {
   const {
     blocks,
     savedCharacters,
@@ -75,7 +76,7 @@ const Block = ({ data, index, style }: BlockProps) => {
       </div>
     </div>
   );
-}
+})
 
 type CharacterContainerProps = {
   allCharacters: Characters;
