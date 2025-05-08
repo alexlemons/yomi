@@ -7,6 +7,7 @@ import {
   Dispatch,
   SetStateAction,
 } from "react";
+import classNames from "classnames";
 import AutoSizer from "react-virtualized-auto-sizer";
 import { FixedSizeList as List } from 'react-window';
 import { RootFontSizeContext } from "../../context";
@@ -57,15 +58,13 @@ const Block = ({ data, index, style }: BlockProps) => {
         {characters.map(character => {
           return (
             <div
-              className={[
+              className={classNames(
                 classes.character,
-                character === selectedCharacter 
-                  ? classes.characterSelected 
-                  : '',
-                savedCharacters.includes(character)
-                  ? classes.characterSaved 
-                  : '',
-              ].join(' ')}
+                {
+                  [classes.characterSelected]: character === selectedCharacter,
+                  [classes.characterSaved]: savedCharacters.includes(character),
+                }
+              )}
               key={character}
               onClick={() => setSelectedCharacter(character)}
             >

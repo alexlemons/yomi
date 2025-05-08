@@ -1,4 +1,5 @@
 import { useEffect, useState, Dispatch, SetStateAction } from 'react';
+import classNames from 'classnames';
 import {
   Characters,
   CharacterProperties,
@@ -27,9 +28,14 @@ export const SelectedContainer = ({
     if (!selectedCharacter) return;
 
     // Transition character in/out
-    setTimeout(() => {
+    const timerId = setTimeout(() => {
       setCharacter(allCharacters[selectedCharacter]);
     }, 400);
+
+    return () => {
+      clearTimeout(timerId);
+    }
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCharacter, setCharacter]);
 
@@ -56,15 +62,15 @@ export const SelectedContainer = ({
     : [[], []];
     
   const literal = character.literal;
-  const transition = literal !== selectedCharacter;
+  const isTransitioning = literal !== selectedCharacter;
   const isSaved = savedCharacters.includes(literal);
 
   return (
     <div
-      className={[
+      className={classNames(
         classes.root,
-        !transition ? classes.show : '',
-      ].join(' ')}
+        {[classes.show]: !isTransitioning}
+      )}
     >
       <h3>{literal}</h3>
       {character.meanings 

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import classNames from 'classnames';
 import { ScrollState } from '../character-container';
+import { Link } from '../link';
 import classes from './index.module.css';
 
 type InfoContainerProps = {
@@ -13,41 +15,44 @@ export const InfoContainer = ({
   const gradeTransitionRef = useRef<number>(0);
 
   useEffect(() => {
+    // Transition grade in/out.
     if (grade && scrollState.grade) {
       clearTimeout(gradeTransitionRef.current);
       setGrade(scrollState.grade);
     } else {
-      // Transition grade in/out
       gradeTransitionRef.current = setTimeout(() => {
         setGrade(scrollState.grade);
       }, 400);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scrollState.grade, setGrade]);
 
-  const gradeTransition = grade !== scrollState.grade;
+    return () => {
+      clearTimeout(gradeTransitionRef.current);
+    }
+  }, [grade, setGrade, scrollState.grade]);
+
+  const gradeIsTransitioning = grade !== scrollState.grade;
 
   return (
     <div className={classes.root}>
       <div
-        className={[
+        className={classNames(
           classes.grade,
-          !gradeTransition ? classes.show : '',
-        ].join(' ')}
+          {[classes.show]: !gradeIsTransitioning}
+        )}
       >
         {grade ? `grade ${grade}` : ''}
       </div>
       <p
-        className={[
+        className={classNames(
           classes.about,
-          scrollState.atBottom ? classes.show : '',
-        ].join(' ')}
+          {[classes.show]: scrollState.atBottom}
+        )}
       >
-        This site uses <a href="https://www.edrdg.org/wiki/index.php/KANJIDIC_Project" target="_blank">Kanjidic</a> as its data source.
+        This site uses <Link href="https://www.edrdg.org/wiki/index.php/KANJIDIC_Project" text="Kanjidic"/> as its data source.
         <br/>
-        For any issues or suggestions please get in touch through <a href="https://github.com/alexlemons/kanjigen" target="_blank">GitHub</a>.
+        For any issues or suggestions please get in touch through <Link href="https://github.com/alexlemons/kanjigen" text="GitHub"/>.
         <br/>
-        For an extensive Japanese dictionary visit <a href="https://jisho.org" target="_blank">Jisho.org</a>.
+        For an extensive Japanese dictionary visit <Link href="https://jisho.org" text="Jisho.org"/>.
       </p>
     </div>
   );
