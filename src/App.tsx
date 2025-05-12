@@ -89,15 +89,15 @@ export const App = () => {
         setSavedCharacters={setSavedCharacters}
         selectedCharacter={selectedCharacter}
       />
-      <InfoContainer 
-        scrollState={scrollState}
-      />
       <CharacterContainer
         allCharacters={allCharacters}
         savedCharacters={savedCharacters}
         setScrollState={setScrollState}
         selectedCharacter={selectedCharacter}
         setSelectedCharacter={setSelectedCharacter}
+      />
+      <InfoContainer 
+        scrollState={scrollState}
       />
       <ErrorContainer error={error} />
     </RootFontSizeProvider>

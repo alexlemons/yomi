@@ -59,6 +59,7 @@ const Block = memo(({ data, index, style }: BlockProps) => {
         {characters.map(character => {
           return (
             <div
+              aria-label="select character"
               className={classNames(
                 classes.character,
                 {
@@ -68,6 +69,13 @@ const Block = memo(({ data, index, style }: BlockProps) => {
               )}
               key={character}
               onClick={() => setSelectedCharacter(character)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  setSelectedCharacter(character);
+                }
+              }}
+              role="button"
+              tabIndex={0}
             >
               {character}
             </div>

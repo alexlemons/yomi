@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import classes from "./index.module.css";
 
 type BookmarkIconProps = {
@@ -9,12 +10,35 @@ export const BookmarkIcon = ({
   active,
   onClick,
 }: BookmarkIconProps) => {
+  // a11y: keyboard toggle save
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 's' && (event.ctrlKey || event.metaKey)) {
+        // Prevent browser's default save action
+        event.preventDefault();
+        onClick();
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [onClick]);
+
   return (
     <div
+      aria-label={active ? 'unsave' : 'save'}
       className={classes.root}
       onClick={onClick}
+      role="button"
     >
-      <svg fill="currentColor" viewBox="0 0 24 24">
+      <svg
+        fill="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <title>{active ? 'Unsave (Ctrl/Cmd+S)' : 'Save (Ctrl/Cmd+S)'}</title> {/* a11y tooltip */}
         {active ? (
           <path d="M20 22a.999.999 0 0 1-.687-.273L12 14.815l-7.313 6.912A1 1 0 0 1 3 21V3a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1Z"></path>
         ) : (
