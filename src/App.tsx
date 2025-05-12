@@ -41,13 +41,13 @@ const INITIAL_CHARACTERS = {
 }
 
 const CHARACTERS_TO_LOAD = [
-  '/kanjigen/kanji-4.json',
-  '/kanjigen/kanji-5.json',
-  '/kanjigen/kanji-6.json',
-  '/kanjigen/kanji-8.json',
-  '/kanjigen/kanji-9.json',
-  '/kanjigen/kanji-10.json',
-  '/kanjigen/kanji-no-grade.json',
+  '/kanji-explorer/kanji-4.json',
+  '/kanji-explorer/kanji-5.json',
+  '/kanji-explorer/kanji-6.json',
+  '/kanji-explorer/kanji-8.json',
+  '/kanji-explorer/kanji-9.json',
+  '/kanji-explorer/kanji-10.json',
+  '/kanji-explorer/kanji-no-grade.json',
 ];
 
 export const App = () => {

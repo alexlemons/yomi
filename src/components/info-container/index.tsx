@@ -50,7 +50,7 @@ export const InfoContainer = ({
       >
         This site uses <Link href="https://www.edrdg.org/wiki/index.php/KANJIDIC_Project" text="Kanjidic"/> as its data source.
         <br/>
-        For any issues or suggestions please get in touch through <Link href="https://github.com/alexlemons/kanjigen" text="GitHub"/>.
+        For any issues or suggestions please get in touch through <Link href="https://github.com/alexlemons/kanji-explorer" text="GitHub"/>.
         <br/>
         For an extensive Japanese dictionary visit <Link href="https://jisho.org" text="Jisho.org"/>.
       </p>
