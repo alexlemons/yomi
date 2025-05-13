@@ -60,8 +60,6 @@ export const SelectedContainer = ({
         return acc;
       }, [[], []])
     : [[], []];
-
-  console.log(character)
     
   const literal = character.literal;
   const isTransitioning = literal !== selectedCharacter;
