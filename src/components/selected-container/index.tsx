@@ -7,7 +7,7 @@ import {
 import { BookmarkIcon } from '../bookmark-icon';
 import classes from "./index.module.css";
 
-const MAX_YOMI = 6;
+const MAX_YOMI = 8;
 
 type SelectedCharacterContainerProps = {
   allCharacters: Characters;
@@ -60,6 +60,8 @@ export const SelectedContainer = ({
         return acc;
       }, [[], []])
     : [[], []];
+
+  console.log(character)
     
   const literal = character.literal;
   const isTransitioning = literal !== selectedCharacter;
@@ -75,13 +77,14 @@ export const SelectedContainer = ({
       <h3>{literal}</h3>
       {character.meanings 
         ? (
-          <div className={classes.meanings}>
-            {character.meanings.map(({ value }) => (
-              <div key={value}>
+          <ul className={classes.meanings}>
+            {character.meanings.map(({ value }, idx) => (
+              <li key={value}>
+                <h4>{idx + 1}</h4>
                 {value}
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         ) : null}
       <div>
         {kunyomi.length 

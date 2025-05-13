@@ -22,21 +22,26 @@
   margin-bottom: 1.8rem;
 }
 
+h4 {
+  color: var(--faded);
+  font-size: 0.8rem;
+  left: -1.3rem;
+  opacity: 0.75;
+  position: absolute;
+  top: 0;
+}
+
 .meanings {
   margin-bottom: 1.8rem;
+}
+
+.meanings li {
+  position: relative;
 }
 
 .readings {
   color: var(--faded);
   position: relative
-}
-
-.readings h4 {
-  font-size: 0.8rem;
-  left: -1.3rem;
-  opacity: 0.5;
-  position: absolute;
-  top: 0;
 }
 
 .readings:last-child {
