@@ -2,7 +2,6 @@ import kanjidic from './dict/kanjidic.json' with { type: "json" };
 import fs from 'fs';
 
 const GRADES = [1, 2, 3, 4, 5, 6, 8, 9, 10]
-const MEANING_MAX_LENGTH = 22
 
 function formatKanji(kanji) {
     return kanji.map(item => ({
@@ -13,7 +12,7 @@ function formatKanji(kanji) {
         meanings: item.meanings
             ?.filter(m => m.lang === 'en')
             .filter(m => !m.value.includes('radical'))
-            .filter(m => m.value.length <= MEANING_MAX_LENGTH)
+            .filter(m => !!m.value),
     }))
 }
 
