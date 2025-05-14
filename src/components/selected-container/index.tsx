@@ -1,4 +1,10 @@
-import { useEffect, useState, Dispatch, SetStateAction } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useState,
+  Dispatch,
+  SetStateAction,
+} from 'react';
 import classNames from 'classnames';
 import {
   Characters,
@@ -39,13 +45,32 @@ export const SelectedContainer = ({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCharacter, setCharacter]);
 
-  const handleSaveCharacter = (character: string) => {
+  const handleSaveCharacter = useCallback((character: string) => {
     setSavedCharacters(prev => {
       return prev.includes(character)
         ? prev.filter(c => c !== character)
         : [...prev, character];
     });
-  } 
+  }, [setSavedCharacters]);
+
+  // a11y: handle keyboard save
+  useEffect(() => {
+    if (!character) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 's' && (event.ctrlKey || event.metaKey)) {
+        // Prevent browser's default save action
+        event.preventDefault();
+        handleSaveCharacter(character.literal);
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [character, handleSaveCharacter]);
 
   if (!character) return null;
 

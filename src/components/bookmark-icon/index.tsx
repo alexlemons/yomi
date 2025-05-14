@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import classes from "./index.module.css";
 
 type BookmarkIconProps = {
@@ -10,23 +9,6 @@ export const BookmarkIcon = ({
   active,
   onClick,
 }: BookmarkIconProps) => {
-  // a11y: keyboard toggle save
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 's' && (event.ctrlKey || event.metaKey)) {
-        // Prevent browser's default save action
-        event.preventDefault();
-        onClick();
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown);
-    
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    }
-  }, [onClick]);
-
   return (
     <div
       aria-label={active ? 'unsave' : 'save'}
