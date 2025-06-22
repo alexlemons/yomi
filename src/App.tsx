@@ -7,9 +7,7 @@ import {
   CharacterContainer,
   ErrorContainer,
   ErrorMessage,
-  InfoContainer,
   SelectedContainer,
-  ScrollState,
 } from './components';
 import {
   Characters,
@@ -54,7 +52,6 @@ export const App = () => {
   const [error, setError] = useState<ErrorMessage | null>(null);
   const [allCharacters, setAllCharacters] = useState<Characters>(INITIAL_CHARACTERS);
   const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
-  const [scrollState, setScrollState] = useState<ScrollState>({ atBottom: false, grade: 1 });
   const [savedCharacters, setSavedCharacters] = useLocalStorage<string[]>(LS_KEY_SAVED_CHARACTERS, []);
   
   useEffect(() => {
@@ -92,12 +89,8 @@ export const App = () => {
       <CharacterContainer
         allCharacters={allCharacters}
         savedCharacters={savedCharacters}
-        setScrollState={setScrollState}
         selectedCharacter={selectedCharacter}
         setSelectedCharacter={setSelectedCharacter}
-      />
-      <InfoContainer 
-        scrollState={scrollState}
       />
       <ErrorContainer error={error} />
     </RootFontSizeProvider>

@@ -20,11 +20,6 @@ const ROWS_PER_BLOCK = 12;
 const BLOCK_LENGTH = ROW_LENGTH * ROWS_PER_BLOCK;
 const ROW_HEIGHT_REM = 3.4;
 
-export type ScrollState = {
-  atBottom: boolean;
-  grade: number | null;
-};
-
 type BlockProps = {
   data: {
     blocks: string[][];
@@ -89,7 +84,6 @@ const Block = memo(({ data, index, style }: BlockProps) => {
 type CharacterContainerProps = {
   allCharacters: Characters;
   savedCharacters: string[];
-  setScrollState: Dispatch<SetStateAction<ScrollState>>;
   selectedCharacter: string | null;
   setSelectedCharacter: Dispatch<SetStateAction<string | null>>;
 }
@@ -114,7 +108,6 @@ const innerElementType = forwardRef<
 export const CharacterContainer = ({
   allCharacters,
   savedCharacters,
-  setScrollState,
   selectedCharacter,
   setSelectedCharacter,
 }: CharacterContainerProps) => {
@@ -161,15 +154,6 @@ export const CharacterContainer = ({
             itemData={itemData}
             itemSize={rootFontSize * ROW_HEIGHT_REM * ROWS_PER_BLOCK}
             overscanCount={2}
-            onItemsRendered={({
-              visibleStartIndex,
-              visibleStopIndex
-            }) => {
-              setScrollState({
-                atBottom: (visibleStopIndex + 1) === blocks.length,
-                grade: allCharacters[blocks[visibleStartIndex][0]].misc.grade,
-              });
-            }}
             width={width}
           >
             {Block}
