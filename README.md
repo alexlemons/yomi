@@ -1,5 +1,5 @@
-# Kanji Explorer
+### よみ
 
-漢字探検する
+[Kanjidic](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project) and [JMDict](https://www.edrdg.org/jmdict/j_jmdict.html) used as data sources.  
 
-A Kanji dictionary that can be used as a reference for students learning Japanese. It uses the [Kanjidic Project](https://www.edrdg.org/wiki/index.php/KANJIDIC_Project) as its data source.
+Desktop only (1440px) for now.

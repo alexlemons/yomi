@@ -1,81 +1,58 @@
 import {
-  useCallback,
-  useEffect,
-  useState,
   Dispatch,
   SetStateAction,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
 } from 'react';
-import classNames from 'classnames';
-import {
-  Characters,
-  CharacterProperties,
-} from "../../characters";
-import { BookmarkIcon } from '../bookmark-icon';
+import { CharactersContext } from '../../context';
+import { TagSelect } from '../tag-select';
+import { Tag, TaggedCharacters } from '../../types';
 import classes from "./index.module.css";
 
+const MAX_MEANINGS = 10;
 const MAX_YOMI = 8;
 
 type SelectedCharacterContainerProps = {
-  allCharacters: Characters;
-  savedCharacters: string[];
-  setSavedCharacters: Dispatch<SetStateAction<string[]>>
-  selectedCharacter: string | null;
+  taggedCharacters: TaggedCharacters;
+  setTaggedCharacters: Dispatch<SetStateAction<TaggedCharacters>>;
 };
 
 export const SelectedContainer = ({
-  allCharacters,
-  savedCharacters,
-  setSavedCharacters,
-  selectedCharacter,
+  taggedCharacters,
+  setTaggedCharacters,
 }: SelectedCharacterContainerProps) => {
-  const [character, setCharacter] = useState<CharacterProperties | null>(null);
+  const {
+    allCharacters,
+    selectedCharacter,
+  } = useContext(CharactersContext);
+  const [tagSelectOpen, setTagSelectOpen] = useState(false);
+
+  const characterProperties = selectedCharacter 
+    ? allCharacters[selectedCharacter]
+    : null;
 
   useEffect(() => {
-    if (!selectedCharacter) return;
+    if (!selectedCharacter) {
+      return;
+    };
+    setTagSelectOpen(false);
+  }, [selectedCharacter]);
 
-    // Transition character in/out
-    const timerId = setTimeout(() => {
-      setCharacter(allCharacters[selectedCharacter]);
-    }, 400);
-
-    return () => {
-      clearTimeout(timerId);
-    }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCharacter, setCharacter]);
-
-  const handleSaveCharacter = useCallback((character: string) => {
-    setSavedCharacters(prev => {
-      return prev.includes(character)
-        ? prev.filter(c => c !== character)
-        : [...prev, character];
-    });
-  }, [setSavedCharacters]);
-
-  // a11y: handle keyboard save
-  useEffect(() => {
-    if (!character) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 's' && (event.ctrlKey || event.metaKey)) {
-        // Prevent browser's default save action
-        event.preventDefault();
-        handleSaveCharacter(character.literal);
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown);
+  const handleTagCharacter = useCallback((tag: Tag | null) => {
+    if (!characterProperties) {
+      return;
+    };
     
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    }
-  }, [character, handleSaveCharacter]);
+    setTaggedCharacters(prev => ({ 
+      ...prev,
+      [characterProperties.literal]: tag
+    }));
+  }, [characterProperties, setTaggedCharacters]);
 
-  if (!character) return null;
-
-  const [kunyomi, onyomi] = character.readings
-    ? character.readings
+  const [kunyomi, onyomi] = characterProperties?.readings
+    ? characterProperties.readings
       .reduce<[string[], string[]]>((acc, reading) => {
         if (reading.type === 'ja_kun') {
           acc[0].push(reading.value);
@@ -86,57 +63,56 @@ export const SelectedContainer = ({
       }, [[], []])
     : [[], []];
     
-  const literal = character.literal;
-  const isTransitioning = literal !== selectedCharacter;
-  const isSaved = savedCharacters.includes(literal);
+  const literal = characterProperties?.literal;
+  const tag = literal ? taggedCharacters[literal] ?? null : null;
 
   return (
-    <div
-      className={classNames(
-        classes.root,
-        {[classes.show]: !isTransitioning}
-      )}
-    >
-      <h3>{literal}</h3>
-      {character.meanings 
+    <div className={classes.root}>
+      {literal ? (
+        <h2>{literal}</h2>
+      ) : null}
+      {characterProperties?.meanings 
         ? (
           <ul className={classes.meanings}>
-            {character.meanings.map(({ value }, idx) => (
-              <li key={value}>
-                <h4>{idx + 1}</h4>
-                {value}
-              </li>
-            ))}
+            {characterProperties.meanings
+              .slice(0, MAX_MEANINGS)
+              .map(({ value }, idx) => (
+                <li key={value}>
+                  <h4>{idx + 1}</h4>
+                  {value}
+                </li>
+              ))}
           </ul>
         ) : null}
       <div>
         {kunyomi.length 
           ? (
-            <div className={classes.readings}>
+            <ul className={classes.readings}>
               <h4>K</h4>
               {kunyomi.slice(0, MAX_YOMI).map(kun => (
-                <div key={kun}>
+                <li key={kun}>
                   {kun}
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           ) : null}
         {onyomi.length 
           ? (
-            <div className={classes.readings}>
+            <ul className={classes.readings}>
               <h4>O</h4>
               {onyomi.slice(0, MAX_YOMI).map(on => (
-                <div key={on}>
+                <li key={on}>
                   {on}
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           ) : null}
       </div>
-
-      <BookmarkIcon
-        active={isSaved}
-        onClick={() => handleSaveCharacter(literal)}
+      <TagSelect
+        onTagClick={handleTagCharacter}
+        open={tagSelectOpen}
+        setOpen={setTagSelectOpen}
+        selectedTag={tag}
       />
     </div>
   );

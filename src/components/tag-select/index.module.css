@@ -1,0 +1,19 @@
+.root {
+  flex-direction: column-reverse;
+  display: flex;
+  gap: 0.4rem;
+  margin-top: auto;
+  position: relative;
+}
+
+.tag {
+  border-radius: 50%;
+  height: 1.3rem;
+  transition: background-color 0.4s ease-in, border 0.4s ease-in;
+  width: 1.3rem;
+}
+
+.root h4 {
+  bottom: -0.24rem;
+  top: initial;
+}

@@ -1,98 +1,52 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect } from 'react';
+import { BrowserRouter } from 'react-router';
 import { useLocalStorage } from 'usehooks-ts';
 import {
   CharacterContainer,
   ErrorContainer,
-  ErrorMessage,
+  MiddleContainer,
   SelectedContainer,
 } from './components';
 import {
-  Characters,
-  CharacterProperties,
-} from "./characters";
-import { RootFontSizeProvider } from "./context";
-import { shuffleArray } from "./utils/array";
+  CharactersProvider,
+  CharacterContainerListRefProvider,
+  ScreenSizeProvider,
+} from "./context";
+import {
+  TaggedCharacters,
+} from "./types";
 
-import { kanji1 } from './characters/kanji/kanji-1';
-import { kanji2 } from './characters/kanji/kanji-2';
-import { kanji3 } from './characters/kanji/kanji-3';
-
-const LS_KEY_SAVED_CHARACTERS = 'saved-characters';
-
-function formatCharacters(
-  characters: CharacterProperties[],
-): Characters {
-  return shuffleArray(characters)
-    .reduce<Characters>((acc, c) => {
-      acc[c.literal] = c;
-      return acc;
-    }, {});
-}
-
-const INITIAL_CHARACTERS = {
-  ...formatCharacters(kanji1),
-  ...formatCharacters(kanji2),
-  ...formatCharacters(kanji3),
-}
-
-const CHARACTERS_TO_LOAD = [
-  '/kanji-explorer/kanji-4.json',
-  '/kanji-explorer/kanji-5.json',
-  '/kanji-explorer/kanji-6.json',
-  '/kanji-explorer/kanji-8.json',
-  '/kanji-explorer/kanji-9.json',
-  '/kanji-explorer/kanji-10.json',
-  '/kanji-explorer/kanji-no-grade.json',
-];
+const CSS_HUE = '--hue';
+const LS_KEY_HUE = 'hue';
+const LS_KEY_TAGGED_CHARACTERS = 'tagged-characters';
 
 export const App = () => {
-  const [error, setError] = useState<ErrorMessage | null>(null);
-  const [allCharacters, setAllCharacters] = useState<Characters>(INITIAL_CHARACTERS);
-  const [selectedCharacter, setSelectedCharacter] = useState<string | null>(null);
-  const [savedCharacters, setSavedCharacters] = useLocalStorage<string[]>(LS_KEY_SAVED_CHARACTERS, []);
-  
+  const [hue, _setHue] = useLocalStorage<number | null>(LS_KEY_HUE, null);
+  const [taggedCharacters, setTaggedCharacters] = useLocalStorage<TaggedCharacters>(LS_KEY_TAGGED_CHARACTERS, {});
+
   useEffect(() => {
-    async function sequentiallyLoadCharacters() {
-      for (const path of CHARACTERS_TO_LOAD) {
-        try {
-          const response = await fetch(path);
-          if (!response.ok) {
-            throw new Error(`Response status: ${response.status}`);
-          }
-      
-          const json = await response.json();
-          setAllCharacters(prev => ({
-            ...prev,
-            ...formatCharacters(json),
-          }));
-        } catch (error) {
-          console.error(error);
-          setError(ErrorMessage.KANJI_FETCH_ERROR);
-        }
-      }
+    if (hue) {
+      document.documentElement.style.setProperty(CSS_HUE, String(hue));
     }
-
-    sequentiallyLoadCharacters();
-  }, []);
-
+  }, [hue]);
+    
   return (
-    <RootFontSizeProvider>
-      <SelectedContainer 
-        allCharacters={allCharacters}
-        savedCharacters={savedCharacters}
-        setSavedCharacters={setSavedCharacters}
-        selectedCharacter={selectedCharacter}
-      />
-      <CharacterContainer
-        allCharacters={allCharacters}
-        savedCharacters={savedCharacters}
-        selectedCharacter={selectedCharacter}
-        setSelectedCharacter={setSelectedCharacter}
-      />
-      <ErrorContainer error={error} />
-    </RootFontSizeProvider>
+    <BrowserRouter>
+      <ScreenSizeProvider>
+        <CharacterContainerListRefProvider>
+          <CharactersProvider>
+              <SelectedContainer 
+                taggedCharacters={taggedCharacters}
+                setTaggedCharacters={setTaggedCharacters}
+              />
+              <MiddleContainer />
+              <CharacterContainer
+                taggedCharacters={taggedCharacters}
+              />
+              <ErrorContainer />
+          </CharactersProvider>
+        </CharacterContainerListRefProvider>
+      </ScreenSizeProvider>
+    </BrowserRouter>
   );
 }

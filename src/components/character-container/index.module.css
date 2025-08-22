@@ -2,45 +2,29 @@
 .root {
   height: 100vh;
   position: relative;
-  width: 100%;
 }
 
 .block {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
+  padding-right: 2.1rem;
 }
 
 .blockInner {
   display: flex;
   flex-wrap: wrap;
   margin-bottom: auto;
-  max-width: 51rem;
 }
 
 .character {
   align-items: center;
-  border: 0.5px solid var(--border);
-  color: var(--faded);
+  border: 0.5px solid var(--very-light);
+  color: var(--mid);
   cursor: pointer;
   display: flex;
   height: 3.4rem;
   justify-content: center;
   position: relative;
-  transition: background-color 0.2s ease-in;
+  transition: background-color 0.4s ease-in;
   width: 3.4rem;
-}
-
-.characterSelected {
-  background-color: white;
-}
-
-.characterSaved::after {
-  background-color: var(--faded);
-  content: '';
-  display: block;
-  width: 0.3rem;
-  height: 0.3rem;
-  position: absolute;
-  top: 0.0rem;
-  left: 0.0rem;
 }

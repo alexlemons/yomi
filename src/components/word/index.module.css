@@ -1,0 +1,49 @@
+.root {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 3.4rem;
+  position: relative;
+}
+
+.root:last-child {
+  margin-bottom: 0;
+}
+
+.ele {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.ele .reading {
+  color: var(--mid);
+  font-size: 1rem;
+  line-height: 0.85rem;
+}
+
+.ele .keb {
+  font-size: 2.1rem;
+  line-height: 3.4rem;
+}
+
+.ele .keb .canSelect {
+  color: var(--mid);
+  cursor: pointer;
+}
+
+.ele .keb .canSelect:hover {
+  color: var(--tag2);
+}
+
+.sense li {
+  font-size: 1.3rem;
+  line-height: 1.7rem;
+  position: relative;
+}
+
+.commonWord {
+  position: absolute;
+  right: 0;
+  top: 0;
+}

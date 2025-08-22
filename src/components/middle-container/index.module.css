@@ -1,0 +1,19 @@
+.root {
+  background: var(--very-light);
+  flex: 1;
+  height: 100vh;
+  overflow-y: scroll;
+  padding: 10.2rem 2.1rem 3.4rem;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.root::-webkit-scrollbar {
+  display: none;
+}
+
+.words {
+  display: flex;
+  flex-direction: column;
+}

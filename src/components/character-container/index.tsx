@@ -1,67 +1,95 @@
 import {
-  forwardRef,
+  CSSProperties,
   memo,
   useContext,
   useEffect,
   useMemo,
-  CSSProperties,
-  Dispatch,
-  SetStateAction,
 } from "react";
-import classNames from "classnames";
-import AutoSizer from "react-virtualized-auto-sizer";
-import { FixedSizeList as List } from 'react-window';
-import { RootFontSizeContext } from "../../context";
-import { Characters } from "../../characters";
+import {
+  List,
+  RowComponentProps,
+} from 'react-window';
+import {
+  CharactersContext,
+  CharacterContainerListRefContext,
+  ScreenSizeContext,
+} from "../../context";
+import {
+  DESKTOP_MIN_WIDTH,
+  TaggedCharacters,
+} from "../../types";
 import classes from './index.module.css';
 
-const ROW_LENGTH = 15;
 const ROWS_PER_BLOCK = 12;
-const BLOCK_LENGTH = ROW_LENGTH * ROWS_PER_BLOCK;
-const ROW_HEIGHT_REM = 3.4;
+const CELL_SIZE_REM = 3.4;
 
-type BlockProps = {
-  data: {
-    blocks: string[][];
-    savedCharacters: string[];
-    selectedCharacter: string | null;
-    setSelectedCharacter: Dispatch<SetStateAction<string | null>>;
+const getRowLength = (screenWidth: number): number => {
+  const MIN_DESKTOP_ROWS = 18;
+  const MAX_DESKTOP_ROWS = 27;
+
+  if (screenWidth >= 1800) {
+    return MAX_DESKTOP_ROWS;
   };
-  index: number;
-  style: CSSProperties;
+  if (screenWidth >= DESKTOP_MIN_WIDTH && screenWidth < 1800) {
+    return MIN_DESKTOP_ROWS + Math.floor((screenWidth - DESKTOP_MIN_WIDTH) / 37.5);
+  };
+  return MIN_DESKTOP_ROWS;
+}
+
+type CharacterProps = {
+  taggedCharacters: TaggedCharacters;
+  selectedCharacter: string | null;
+  setSelectedCharacter: (character: string) => void;
 };
 
-const Block = memo(({ data, index, style }: BlockProps) => {
-  const {
-    blocks,
-    savedCharacters,
-    selectedCharacter,
-    setSelectedCharacter,
-  } = data;
+type BlockProps = RowComponentProps<CharacterProps & {
+  blocks: string[][];
+  rowLength: number;
+}>
 
+const Block = memo(({
+  ariaAttributes,
+  blocks,
+  index,
+  rowLength,
+  taggedCharacters,
+  selectedCharacter,
+  setSelectedCharacter,
+  style,
+}: BlockProps) => {
   const characters = blocks[index];
-  const rootFontSize = useContext(RootFontSizeContext);
+  const { rootFontSize } = useContext(ScreenSizeContext);
 
   return (
     <div
       className={classes.block}
       style={{
         ...style,
-        top: `${Number(style.top) + (rootFontSize * ROW_HEIGHT_REM)}px`,
+        top: `${Number(style.top) + (rootFontSize * CELL_SIZE_REM)}px`,
       }}
+      {...ariaAttributes}
     >
-      <div className={classes.blockInner}>
+      <div
+        className={classes.blockInner}
+        style={{ maxWidth: `${rowLength * CELL_SIZE_REM}rem` }}
+      >
         {characters.map(character => {
+          const tag = taggedCharacters[character];
+          const isDarkTag = tag === 1;
+          const isSelected = character === selectedCharacter;
+
+          const characterStyle: CSSProperties = {
+            backgroundColor: tag ? `var(--tag${tag})` : 'inherit',
+            ...(isSelected && {
+                border: `1.5px solid ${isDarkTag ? 'var(--mid)' : 'var(--dark)'}`,
+                color: isDarkTag ? `var(--light)` : `var(--dark)`,
+            })
+          };
+
           return (
             <div
               aria-label="select character"
-              className={classNames(
-                classes.character,
-                {
-                  [classes.characterSelected]: character === selectedCharacter,
-                  [classes.characterSaved]: savedCharacters.includes(character),
-                }
-              )}
+              className={classes.character}
               key={character}
               onClick={() => setSelectedCharacter(character)}
               onKeyDown={e => {
@@ -70,6 +98,7 @@ const Block = memo(({ data, index, style }: BlockProps) => {
                 }
               }}
               role="button"
+              style={characterStyle}
               tabIndex={0}
             >
               {character}
@@ -82,43 +111,29 @@ const Block = memo(({ data, index, style }: BlockProps) => {
 })
 
 type CharacterContainerProps = {
-  allCharacters: Characters;
-  savedCharacters: string[];
-  selectedCharacter: string | null;
-  setSelectedCharacter: Dispatch<SetStateAction<string | null>>;
+  taggedCharacters: TaggedCharacters;
 }
 
-const innerElementType = forwardRef<
-  HTMLDivElement,
-  { style: CSSProperties }
->(({ style, ...rest }, ref) => {
-  const rootFontSize = useContext(RootFontSizeContext);
-  return (
-    <div
-      ref={ref}
-      style={{
-        ...style,
-        height: `${Number(style.height) + (rootFontSize * ROW_HEIGHT_REM)}px`
-      }}
-      {...rest}
-    />
-  );
-})
-
 export const CharacterContainer = ({
-  allCharacters,
-  savedCharacters,
-  selectedCharacter,
-  setSelectedCharacter,
+  taggedCharacters,
 }: CharacterContainerProps) => {
-  const rootFontSize = useContext(RootFontSizeContext);
+  const { rootFontSize, width } = useContext(ScreenSizeContext);
+  const listRef = useContext(CharacterContainerListRefContext);
+  const {
+    allCharacters,
+    selectedCharacter,
+    setSelectedCharacter,
+  } = useContext(CharactersContext);
+
+  const rowLength = getRowLength(width);
 
   // Characters split into subset blocks.
   // Blocks rendered by react-window.
-  const blocks = useMemo(() => {    
+  const blocks = useMemo(() => {
+    const blockLength = rowLength * ROWS_PER_BLOCK;
     return Object.keys(allCharacters)
       .reduce<string[][]>((acc, character, idx) => {
-        const blockIndex = Math.floor(idx/BLOCK_LENGTH);
+        const blockIndex = Math.floor(idx/blockLength);
 
         if(!acc[blockIndex]) {
           acc[blockIndex] = [];
@@ -128,38 +143,57 @@ export const CharacterContainer = ({
 
         return acc;
       }, []);
-  }, [allCharacters]);
+  }, [allCharacters, rowLength]);
 
-  // Select first character on mount.
+  const paddingSize = `${rootFontSize * CELL_SIZE_REM}px`;
+
+  const rootStyle = useMemo(() => ({
+    // row width + padding
+    width: `${rowLength * CELL_SIZE_REM + 4.2}rem`,
+  }), [rowLength]);
+
   useEffect(() => {
-    setSelectedCharacter(blocks[0][0]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (!listRef.current) {
+      return;
+    }
 
-  const itemData = {
+    listRef.current.scrollToCharacter = (character: string) => {
+      const blockIndex = blocks.findIndex(block => block.includes(character));
+      if (blockIndex > -1) {
+        listRef.current?.scrollToRow({
+          align: 'center',
+          index: blockIndex,
+        })
+      }
+    }
+  }, [
     blocks,
-    savedCharacters,
-    selectedCharacter,
-    setSelectedCharacter,
-  };
+    listRef,
+  ]);
 
   return (
-    <div className={classes.root}>
-      <AutoSizer>
-        {({ height, width }) => (
-          <List
-            height={height}
-            innerElementType={innerElementType}
-            itemCount={blocks.length}
-            itemData={itemData}
-            itemSize={rootFontSize * ROW_HEIGHT_REM * ROWS_PER_BLOCK}
-            overscanCount={2}
-            width={width}
-          >
-            {Block}
-          </List>
-        )}
-      </AutoSizer>
+    <div
+      className={classes.root}
+      style={rootStyle}
+    >
+      <List
+        listRef={listRef}
+        overscanCount={2}
+        rowComponent={Block}
+        rowCount={blocks.length}
+        rowHeight={rootFontSize * CELL_SIZE_REM * ROWS_PER_BLOCK}
+        rowProps={{
+          blocks,
+          rowLength,
+          taggedCharacters,
+          selectedCharacter,
+          setSelectedCharacter,
+        }}
+        style={{
+          paddingTop: paddingSize,
+          paddingBottom: paddingSize,
+        }}
+      />
     </div>
   );
 }

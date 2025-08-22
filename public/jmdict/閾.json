@@ -1,0 +1,1 @@
+[{"ent_seq":1594140,"k_ele":[{"keb":"閾値","ke_pri":["spec1"]},{"keb":"しきい値","ke_pri":["spec1"]},{"keb":"いき値"}],"r_ele":[{"reb":"いきち","re_restr":["閾値","いき値"],"re_pri":["spec1"]},{"reb":"しきいち","re_restr":["閾値","しきい値"],"re_pri":["spec1"]}],"sense":[{"pos":["noun (common) (futsuumeishi)"],"gloss":[{"value":"threshold (amount, dose, etc.)","lang":"eng"}]}]}]

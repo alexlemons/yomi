@@ -1,21 +1,15 @@
+import { useContext } from 'react';
+import { CharactersContext } from '../../context';
 import classes from './index.module.css';
 
-export enum ErrorMessage {
-  KANJI_FETCH_ERROR = 'Some Kanji failed to load. Please refresh the page.',
-}
+export const ErrorContainer = () => {
+  const { error } = useContext(CharactersContext);
 
-type ErrorContainerProps = {
-  error: ErrorMessage | null;
-};
-
-export const ErrorContainer = ({
-  error,
-}: ErrorContainerProps) => {
   if (!error) return null;
-
+  
   return (
     <div className={classes.root}>
-      {error}
+      Error fetching data. Please refresh.
     </div>
   );
 }

@@ -1,0 +1,9 @@
+.root {
+  background: var(--mid);
+  border-radius: 0.2rem;
+  color: var(--light);
+  font-size: 0.8rem;
+  line-height: 0.8rem;
+  opacity: 0.6;
+  padding: 0.2rem 0.5rem;
+}
