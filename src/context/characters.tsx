@@ -48,14 +48,16 @@ type CharactersContext = {
   selectedCharacter: string | null,
   setSelectedCharacter: (character: string) => void; 
   selectedCharacterDict: JMDictProperties[] | null;
+  selectedCharacterDictLoading: boolean;
   error: FetchError | null,
 };
 
 export const CharactersContext = createContext<CharactersContext>({
   allCharacters: {},
-  selectedCharacterDict: null,
   selectedCharacter: null,
   setSelectedCharacter: () => null,
+  selectedCharacterDict: null,
+  selectedCharacterDictLoading: false,
   error: null,
 });
 
@@ -73,6 +75,7 @@ export const CharactersProvider = ({
     setSearchParams({ [SP_KEY_SELECTED_CHARACTER]: character });
   }
   const [selectedCharacterDict, setSelectedCharacterDict] = useState<JMDictProperties[] | null>(null);
+  const [selectedCharacterDictLoading, setSelectedCharacterDictLoading] = useState(false);
   const [error, setError] = useState<FetchError | null>(null);
 
   // Sequentially fetch all characters
@@ -102,16 +105,15 @@ export const CharactersProvider = ({
 
   // Fetch selected character jmdict if it exists
   useEffect(() => {
-    if (!selectedCharacter) {
+    setSelectedCharacterDict(null);
+
+    if (!selectedCharacter || !jmdictIndex.includes(selectedCharacter)) {
       return;
     };
 
-    if (!jmdictIndex.includes(selectedCharacter)) {
-      setSelectedCharacterDict(null);
-      return;
-    }
-
     async function fetchDict() {
+      setSelectedCharacterDictLoading(true);
+
       try {
         const response = await fetch(`/yomi/jmdict/${selectedCharacter}.json`);
         if (!response.ok) {
@@ -123,6 +125,8 @@ export const CharactersProvider = ({
       } catch (error) {
         console.error(error);
         setError(FetchError.Dict);
+      } finally {
+        setSelectedCharacterDictLoading(false);
       }
     }
 
@@ -133,9 +137,10 @@ export const CharactersProvider = ({
 
   const value = {
     allCharacters,
-    selectedCharacterDict,
     selectedCharacter,
     setSelectedCharacter,
+    selectedCharacterDict,
+    selectedCharacterDictLoading,
     error,
   };
 

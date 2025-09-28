@@ -9,7 +9,10 @@ import classes from './index.module.css';
 
 export const MiddleContainer = () => {
   const rootRef = useRef<HTMLDivElement>(null);
-  const { selectedCharacterDict } = useContext(CharactersContext);
+  const {
+    selectedCharacterDict,
+    selectedCharacterDictLoading,
+  } = useContext(CharactersContext);
 
   useEffect(() => {
     rootRef.current?.scrollTo(0, 0);
@@ -22,6 +25,7 @@ export const MiddleContainer = () => {
       className={classes.root}
       ref={rootRef}
     >
+      {!selectedCharacterDictLoading ? (
       <ul className={classes.words}>
         {dictFiltered
           .map(word => (
@@ -31,6 +35,7 @@ export const MiddleContainer = () => {
             />
           ))}
       </ul>
+      ) : null}
     </div>
   );
 }
