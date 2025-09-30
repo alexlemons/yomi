@@ -14,7 +14,7 @@
 }
 
 :root[data-theme='light'] {
-  --hue: 50;
+  --hue: 245;
   --mid-hue: calc(var(--hue) - 22.5);
 
   --dark: hsl(var(--hue), 0%, 5%);
