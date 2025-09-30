@@ -24,7 +24,7 @@ const ROWS_PER_BLOCK = 12;
 const CELL_SIZE_REM = 3.4;
 
 const getRowLength = (screenWidth: number): number => {
-  const MIN_DESKTOP_ROWS = 18;
+  const MIN_DESKTOP_ROWS = 19;
   const MAX_DESKTOP_ROWS = 27;
 
   if (screenWidth >= 1800) {
