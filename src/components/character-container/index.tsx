@@ -75,7 +75,7 @@ const Block = memo(({
       >
         {characters.map(character => {
           const tag = taggedCharacters[character];
-          const isDarkTag = tag === 1;
+          const isDarkTag = tag && [1, 2].includes(tag);
           const isSelected = character === selectedCharacter;
 
           const characterStyle: CSSProperties = {

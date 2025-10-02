@@ -14,17 +14,17 @@
 }
 
 :root[data-theme='light'] {
-  --hue: 245;
-  --mid-hue: calc(var(--hue) - 22.5);
+  --hue: 240;
+  --mid-hue: calc(var(--hue) - 11.25);
 
   --dark: hsl(var(--hue), 0%, 5%);
-  --mid: hsl(var(--mid-hue), 25%, 37.5%);
+  --mid: hsl(var(--mid-hue), 15%, 45%);
   --light: hsl(var(--hue), 15%, 80%);
-  --very-light: hsl(var(--hue), 40%, 95%);
+  --very-light: hsl(var(--hue), 25%, 90%);
 
   --tag1: hsl(0, 0%, 0%);
-  --tag2: hsl(var(--hue), 20%, 60%);
-  --tag3: hsl(var(--hue), 5%, 60%);
+  --tag2: hsl(var(--mid-hue), 12.5%, 25%);
+  --tag3: hsl(var(--hue), 12.5%, 70%);
   --tag4: hsl(0, 0%, 100%);
 }
 
